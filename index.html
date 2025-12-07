@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>לוח השנה שלנו</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="dark">
+  <div id="app">
+    <header class="top-bar">
+      <div class="month-nav">
+        <button id="prev-month" class="icon-btn" aria-label="חודש קודם">⟨</button>
+        <div class="month-title">
+          <span id="greg-month-label"></span>
+          <span id="hebrew-month-label" class="hebrew-month"></span>
+        </div>
+        <button id="next-month" class="icon-btn" aria-label="חודש הבא">⟩</button>
+      </div>
+
+      <div class="top-actions">
+        <button id="today-btn" class="pill-btn">היום</button>
+        <div class="theme-toggle">
+          <span>☀️</span>
+          <label class="switch">
+            <input type="checkbox" id="theme-toggle-input" checked />
+            <span class="slider round"></span>
+          </label>
+          <span>🌙</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="settings-row">
+      <div class="field-group">
+        <label for="user-select">מי מחובר עכשיו?</label>
+        <select id="user-select">
+          <option value="benjamin">בנימין</option>
+          <option value="nana">ננה</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label for="city-input">עיר</label>
+        <input id="city-input" type="text" placeholder="לדוגמה: Jerusalem, IL" />
+        <button id="city-save-btn" class="small-btn">שמור</button>
+      </div>
+    </section>
+
+    <section class="quick-actions">
+      <button id="free-time-btn" class="pill-btn">זמן חופשי</button>
+      <button id="tasks-btn" class="pill-btn outline">משימות (חודש קדימה)</button>
+      <button id="global-weather-btn" class="pill-btn outline">מזג אוויר להיום ☁️</button>
+    </section>
+
+    <section class="calendar-card">
+      <div class="weekday-row">
+        <div>א'</div>
+        <div>ב'</div>
+        <div>ג'</div>
+        <div>ד'</div>
+        <div>ה'</div>
+        <div>ו'</div>
+        <div>ש'</div>
+      </div>
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </section>
+
+    <!-- Floating add button -->
+    <button id="floating-add-btn" class="floating-add">＋</button>
+
+    <!-- Day details modal -->
+    <div id="day-modal" class="modal-backdrop hidden">
+      <div class="modal">
+        <header class="modal-header">
+          <div>
+            <div id="modal-date-greg" class="modal-date-greg"></div>
+            <div id="modal-date-hebrew" class="modal-date-hebrew"></div>
+          </div>
+          <button id="close-day-modal" class="icon-btn">✕</button>
+        </header>
+
+        <div class="modal-actions">
+          <button id="modal-add-event" class="pill-btn primary">אירוע / משימה חדשה</button>
+          <button id="modal-weather-btn" class="pill-btn">מזג אוויר ליום זה ☁️</button>
+        </div>
+
+        <section class="weather-strip" id="modal-weather-strip"></section>
+
+        <section class="events-list-section">
+          <h3>אירועים ומשימות</h3>
+          <div id="day-events-list" class="events-list"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- New event modal -->
+    <div id="event-modal" class="modal-backdrop hidden">
+      <div class="modal wide">
+        <header class="modal-header">
+          <h2>אירוע / משימה חדשה</h2>
+          <button id="close-event-modal" class="icon-btn">✕</button>
+        </header>
+
+        <form id="event-form" class="event-form">
+          <div class="form-row">
+            <label>סוג</label>
+            <div class="segmented">
+              <label>
+                <input type="radio" name="kind" value="event" checked />
+                <span>אירוע</span>
+              </label>
+              <label>
+                <input type="radio" name="kind" value="task" />
+                <span>משימה</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>למי זה שייך?</label>
+            <div class="segmented three">
+              <label>
+                <input type="radio" name="owner" value="benjamin" checked />
+                <span>בנימין</span>
+              </label>
+              <label>
+                <input type="radio" name="owner" value="nana" />
+                <span>ננה</span>
+              </label>
+              <label>
+                <input type="radio" name="owner" value="both" />
+                <span>משותף</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row two-col">
+            <div>
+              <label for="event-title">כותרת</label>
+              <input id="event-title" name="title" type="text" required />
+            </div>
+            <div>
+              <label for="event-date">תאריך</label>
+              <input id="event-date" name="date" type="date" required />
+            </div>
+          </div>
+
+          <div class="form-row two-col">
+            <div>
+              <label for="event-start">שעת התחלה</label>
+              <input id="event-start" name="start" type="time" required />
+            </div>
+            <div>
+              <label for="event-end">שעת סיום</label>
+              <input id="event-end" name="end" type="time" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="event-address">כתובת (לא חובה, לווייז)</label>
+            <input id="event-address" name="address" type="text" placeholder="רחוב ועיר" />
+          </div>
+
+          <div class="form-row">
+            <label>תזכורת</label>
+            <div class="reminder-row">
+              <label class="switch">
+                <input type="checkbox" id="event-reminder-toggle" checked />
+                <span class="slider round"></span>
+              </label>
+              <span class="reminder-label">קבל התראה</span>
+              <select id="event-reminder-mins">
+                <option value="5">5 דק'</option>
+                <option value="15">15 דק'</option>
+                <option value="30">30 דק'</option>
+                <option value="60" selected>שעה</option>
+                <option value="120">שעתיים</option>
+                <option value="180">3 שעות</option>
+              </select>
+            </div>
+          </div>
+
+          <footer class="modal-footer">
+            <button type="button" id="delete-event-btn" class="pill-btn danger hidden">
+              מחיקת אירוע
+            </button>
+            <div class="spacer"></div>
+            <button type="button" id="cancel-event-btn" class="pill-btn outline">ביטול</button>
+            <button type="submit" class="pill-btn primary">שמירה</button>
+          </footer>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tasks modal -->
+    <div id="tasks-modal" class="modal-backdrop hidden">
+      <div class="modal">
+        <header class="modal-header">
+          <h2>משימות בחודש הקרוב</h2>
+          <button id="close-tasks-modal" class="icon-btn">✕</button>
+        </header>
+        <div id="tasks-container" class="tasks-container"></div>
+      </div>
+    </div>
+
+    <!-- Free time modal -->
+    <div id="free-time-modal" class="modal-backdrop hidden">
+      <div class="modal">
+        <header class="modal-header">
+          <h2>זמן חופשי ביום שנבחר</h2>
+          <button id="close-free-time-modal" class="icon-btn">✕</button>
+        </header>
+        <div id="free-time-content" class="free-time-content"></div>
+      </div>
+    </div>
+
+    <!-- Global weather modal -->
+    <div id="global-weather-modal" class="modal-backdrop hidden">
+      <div class="modal">
+        <header class="modal-header">
+          <h2>מזג אוויר</h2>
+          <button id="close-global-weather-modal" class="icon-btn">✕</button>
+        </header>
+        <div id="global-weather-content" class="weather-strip"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
